@@ -41,9 +41,13 @@ Class RegisterService
 
             DB::commit();
 
-            $token = $user->createToken('authToken')->plainTextToken;
+            // $token = $user->createToken('authToken')->plainTextToken;
 
-            return ['token' => $token];
+            $accessToken = $user->createToken('#$_auth_token_@#',
+             ['expires_in' => config('sanctum.expiration')])->plainTextToken;
+
+
+            return ['token' => $accessToken];
 
         }catch(\Exception $e)
         {
@@ -91,16 +95,15 @@ Class RegisterService
         $code = $request->verify_code;
         $expired_at = $user->created_at->addMinutes(3);
 
-        return $user->verify_code;
-        // if ($code !== $user->verify_code || now() > $expired_at)
-        // {
-        //     return false;
-        // }else{
-        //     $user->resetVerificationCode();
-        //     $user->email_verified_at = now();
-        //     $user->save();
-        //     return true;
-        // }
+        if ($code !== $user->verify_code || now() > $expired_at)
+        {
+            return false;
+        }else{
+            $user->resetVerificationCode();
+            $user->email_verified_at = now();
+            $user->save();
+            return true;
+        }
 
     }
 
@@ -109,7 +112,9 @@ Class RegisterService
     {
         $user = Auth::user();
         $oldToken = $user->currentAccessToken()->delete();
-        $refreshToken = $user->createToken('refresh-token')->plainTextToken;
+        // $refreshToken = $user->createToken('refresh-token')->plainTextToken;
+        $refreshToken = $user->createToken('#$_refresh_token_@#',
+        ['expires_in' => config('sanctum.rt_expiration')])->plainTextToken;
         return $refreshToken;
     }
 }

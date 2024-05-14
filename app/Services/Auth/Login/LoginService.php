@@ -11,9 +11,11 @@ Class LoginService
         $requestData = $request->validated();
         if (Auth::attempt($requestData)) {
             $user = Auth::user();
-            $token = $user->createToken('#$_my_app_token_@#')->plainTextToken;
 
-            return $token;
+            $accessToken = $user->createToken('#$_my_app_token_@#',
+             ['expires_in' => config('sanctum.expiration')])->plainTextToken;
+
+            return $accessToken;
         } else {
             $errorResponse = [
                 'message' => 'Invalid credentials',
