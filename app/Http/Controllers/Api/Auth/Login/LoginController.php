@@ -17,7 +17,6 @@ class LoginController extends Controller
     /************************************************************************/
     public function login(LoginRequest $request)
     {
-        // $requestData = $request->validated();
         $data = $this->loginService->login($request);
         return response()->json(['Token'=>$data,'message' => 'Logged in successfully']);
 

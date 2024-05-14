@@ -91,16 +91,25 @@ Class RegisterService
         $code = $request->verify_code;
         $expired_at = $user->created_at->addMinutes(3);
 
-        if ($code !== $user->verify_code || now() > $expired_at)
-        {
-            return false;
-        }else{
-            $user->resetVerificationCode();
-            $user->email_verified_at = now();
-            $user->save();
-            return true;
-        }
+        return $user->verify_code;
+        // if ($code !== $user->verify_code || now() > $expired_at)
+        // {
+        //     return false;
+        // }else{
+        //     $user->resetVerificationCode();
+        //     $user->email_verified_at = now();
+        //     $user->save();
+        //     return true;
+        // }
 
     }
 
+    /*********************************************************************************************/
+    public function refreshToken()
+    {
+        $user = Auth::user();
+        $oldToken = $user->currentAccessToken()->delete();
+        $refreshToken = $user->createToken('refresh-token')->plainTextToken;
+        return $refreshToken;
+    }
 }

@@ -32,10 +32,20 @@ class RegisterController extends Controller
     {
         $confirmCode = $this->registerService->confirmVerifyCode($request);
 
-        if(!$confirmCode)
+        if($confirmCode == false)
         {
             return response()->json(['message' => 'invalid code','code'=>$confirmCode],401);
         }
         return response()->json(['message' => 'you are verification your email '],200);
+
+
+    }
+    /******************************************************************************************************/
+    public function refreshToken()
+    {
+        $refreshToken = $this->registerService->refreshToken();
+        return response()->json(['access_token' => $refreshToken],200);
+
+
     }
 }

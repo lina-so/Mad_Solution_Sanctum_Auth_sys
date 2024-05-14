@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout/{id}',[LogoutController::class,'logout'])->name('logout');
     Route::post('/resend-code',[RegisterController::class,'resendVerifyCode'])->name('resendVerifyCode');
     Route::post('/confirm-code',[RegisterController::class,'confirmVerifyCode'])->name('confirmVerifyCode');
-
+    Route::post('/refresh-token',[RegisterController::class,'refreshToken'])->name('refreshToken');
 
 
 });

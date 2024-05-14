@@ -21,6 +21,9 @@ class TwoFactorMiddleware
         {
         return $next($request);
         }
-        return new Response('Unauthorized', 401);
+        else{
+             return new Response('please verify your email', 401);
+
+        }
     }
 }
