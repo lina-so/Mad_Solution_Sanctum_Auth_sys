@@ -18,7 +18,7 @@ class LogoutController extends Controller
     {
         try {
             $refreshToken = $this->logoutService->logout();
-            return response()->json(['message' => 'Logged out successfully', 'refresh_token' => $refreshToken]);
+            return response()->json(['message' => 'Logged out successfully']);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
