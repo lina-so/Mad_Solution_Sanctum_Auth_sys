@@ -47,8 +47,8 @@ return [
     */
 
     // 'expiration' => null,
-    'expiration' => 300, // 5 minutes
-    'rt_expiration' => 600, // 10 minutes
+    'expiration' => 5, // 5 minutes
+    'rt_expiration' => 10, // 10 minutes
 
     /*
     |--------------------------------------------------------------------------

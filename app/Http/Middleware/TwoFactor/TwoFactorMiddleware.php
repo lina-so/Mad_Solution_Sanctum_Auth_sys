@@ -17,7 +17,7 @@ class TwoFactorMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $user = Auth::user();
-        if(auth()->check() &&  $user->verify_code)
+        if($user && $user->verify_code)
         {
         return $next($request);
         }

@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\Auth\Login;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 Class LoginService
@@ -10,9 +11,10 @@ Class LoginService
     {
         $requestData = $request->validated();
         if (Auth::attempt($requestData)) {
-            $user = Auth::user();
-
-            $accessToken = $user->createToken('#$_my_app_token_@#',
+            $user = User::whereEmail($requestData['email'])->first();
+            Auth::login($user);
+            $authUser = Auth::user();
+            $accessToken = $authUser->createToken('#$_my_app_token_@#',
              ['expires_in' => config('sanctum.expiration')])->plainTextToken;
 
             return $accessToken;

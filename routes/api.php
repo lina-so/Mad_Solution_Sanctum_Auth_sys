@@ -2,9 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\Auth\Login\LoginController;
-use App\Http\Controllers\Api\Auth\Logout\LogoutController;
-use App\Http\Controllers\Api\Auth\Register\RegisterController;
+use App\Http\Controllers\Api\Auth\AuthController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -23,15 +22,16 @@ use App\Http\Controllers\Api\Auth\Register\RegisterController;
 
 
 
-Route::post('/login',[LoginController::class,'login'])->name('login')->middleware('twoFactor');
-Route::post('/register',[RegisterController::class,'signUp'])->name('register');
+Route::post('/login',[AuthController::class,'login'])->name('login');
+
+Route::post('/register',[AuthController::class,'signUp'])->name('register');
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::post('/logout/{id}',[LogoutController::class,'logout'])->name('logout');
-    Route::post('/resend-code',[RegisterController::class,'resendVerifyCode'])->name('resendVerifyCode');
-    Route::post('/confirm-code',[RegisterController::class,'confirmVerifyCode'])->name('confirmVerifyCode');
-    Route::post('/refresh-token',[RegisterController::class,'refreshToken'])->name('refreshToken');
+    Route::post('/logout/{id}',[AuthController::class,'logout'])->name('logout');
+    Route::post('/resend-code',[AuthController::class,'resendVerifyCode'])->name('resendVerifyCode');
+    Route::post('/confirm-code',[AuthController::class,'confirmVerifyCode'])->name('confirmVerifyCode');
+    Route::post('/refresh-token',[AuthController::class,'refreshToken'])->name('refreshToken');
 
 
 });

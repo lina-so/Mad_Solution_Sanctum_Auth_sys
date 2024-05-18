@@ -36,18 +36,18 @@ Class RegisterService
                 'profile_photo'=>$imagePath ?? null,
                 'certificate'=>$filePath ?? null,
             ]);
+
             // verification Event
             event(new VereficationCodeEvent($user));
 
             DB::commit();
 
-            // $token = $user->createToken('authToken')->plainTextToken;
-
             $accessToken = $user->createToken('#$_auth_token_@#',
              ['expires_in' => config('sanctum.expiration')])->plainTextToken;
 
 
-            return ['token' => $accessToken];
+            return ['token'=> $accessToken];
+
 
         }catch(\Exception $e)
         {
@@ -90,7 +90,6 @@ Class RegisterService
     /***************************************************************************************/
     public function confirmVerifyCode($request)
     {
-
         $user = Auth::user();
         $code = $request->verify_code;
         $expired_at = $user->created_at->addMinutes(3);
@@ -111,8 +110,8 @@ Class RegisterService
     public function refreshToken()
     {
         $user = Auth::user();
-        $oldToken = $user->currentAccessToken()->delete();
-        // $refreshToken = $user->createToken('refresh-token')->plainTextToken;
+        // $oldToken = $user->currentAccessToken()->delete();
+        $user->tokens()->delete();
         $refreshToken = $user->createToken('#$_refresh_token_@#',
         ['expires_in' => config('sanctum.rt_expiration')])->plainTextToken;
         return $refreshToken;

@@ -8,9 +8,8 @@ Class LogoutService
 {
     public function logout()
     {
-        Auth::user()->tokens()->delete();
-        // Generate a new refresh token
-        $refreshToken = Auth::user()->createToken('authRefreshToken')->plainTextToken;
-        return $refreshToken;
+       $user =  Auth::user()->tokens()->delete();
+    // Auth::logout();
+       return $user;
     }
 }
