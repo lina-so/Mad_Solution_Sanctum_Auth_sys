@@ -27,7 +27,7 @@ class RegisterRequest extends FormRequest
             'phone_number'=>['required','string',new PhoneNumberRule()], // 963 985537632 or 20 5489963214
             'user_name'=>['required','string','min:3','max:255'],
             'profile_photo'=>['nullable','image','mimes:png,jpg','dimensions:min_width=200,min_height=200,max_width=1000,max_height=1000'],
-            'certificate'=>['nullable','file','mimes:pdf','max:524288000'], //max:524288000 // 500 * 1024 * 1024 = 524288000 بايت (500 ميغابايت)
+            'certificate'=>['nullable','file','mimes:pdf','max:524288000'], //(104857600) 100M// max:524288000 // 500 * 1024 * 1024 = 524288000 بايت (500 ميغابايت)
             'password'=>['required','string','min:8','confirmed']
 
         ];
