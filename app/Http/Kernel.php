@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\ActivationRequestLimit;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use App\Http\Middleware\TwoFactor\TwoFactorMiddleware;
 
@@ -68,5 +69,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'twoFactor'=>TwoFactorMiddleware::class,
+        'activationLimit' => ActivationRequestLimit::class,
     ];
 }

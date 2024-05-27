@@ -11,7 +11,6 @@ Route::controller(AuthController::class)
         Route::middleware('auth:sanctum')
         ->group(function(){
             Route::post('/logout/{id}','logout')->name('logout');
-            Route::post('/resend-code','resendVerifyCode')->name('resendVerifyCode');
             Route::post('/confirm-code','confirmVerifyCode')->name('confirmVerifyCode');
             Route::post('/refresh-token','refreshToken')->name('refreshToken');
         });
@@ -20,6 +19,8 @@ Route::controller(AuthController::class)
         ->group(function(){
             Route::post('/login','login')->name('login');
             Route::post('/register','signUp')->name('register');
+            Route::post('/resend-code','resendVerifyCode')->name('resendVerifyCode')->middleware('throttle:3,1');
+
         });
 
     });

@@ -8,7 +8,7 @@ Route::controller(AuthController::class)
     ->prefix('auth')
     ->group(function(){
 
-        Route::middleware('auth:sanctum')
+        Route::middleware('guest:sanctum')
         ->group(function(){
             Route::delete('delete-file','deleteFile')->name('file.delete');
         });

@@ -6,9 +6,10 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use App\Events\VereficationCodeEvent;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Session;
 use App\Notifications\Virify\VereficationCodeNotification;
 
 class VereficationCodeListener
@@ -30,8 +31,7 @@ class VereficationCodeListener
         $email = $user->email;
 
         $verificationCode = $user->generateVerificationCode();
-        // session()->put('verify_code', $verificationCode);
-        // $verificationCode = session('verify_code');
+
 
         $expired_at = $user->created_at->addMinutes(3);
         $minutesRemaining = now()->diffInMinutes($expired_at);

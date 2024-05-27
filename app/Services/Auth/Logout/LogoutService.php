@@ -12,14 +12,8 @@ Class LogoutService
 
     public function logout()
     {
-
        $user =  Auth::user();
-       if(!$user)
-       {
-        throw new AuthenticationException();
-       }
        $user->tokens()->delete();
-    // Auth::logout();
        return $user;
     }
 }

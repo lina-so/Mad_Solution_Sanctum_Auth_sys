@@ -20,32 +20,18 @@ Class LoginService
         $requestData = $request->validated();
         $user = User::whereEmail($requestData['email'])->first();
 
-        if (!$user) {
-
-            throw ValidationException::withMessages([
-                'email' => 'The provided email  does not match our records.'
-            ]);
-        }
-
         if (!Hash::check($requestData['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'password' => 'The provided password does not match our records.'
             ]);
-        }
-        // Attempt to log in the user
-        if (!Auth::attempt($requestData)) {
-            return response()->json([
-                'message' => 'Your token has expired, please login again'
-            ], 401);
         }
 
         Auth::login($user);
         $authUser = Auth::user();
 
         if ($authUser->verify_code !== null) {
-            return response()->json([
-                'message' => 'Please verify your email'
-            ], 401);
+            $message = "Please verify your email";
+            return $this->apiError(message: $message,code: 401);
         }
 
         $accessToken = $authUser->createToken('#$_my_app_token_@#', ['expires_in' => config('sanctum.expiration')])->plainTextToken;

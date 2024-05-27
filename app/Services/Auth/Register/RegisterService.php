@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Events\VereficationCodeEvent;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use App\Traits\Files\FileOperationsTrait;
@@ -59,15 +60,13 @@ Class RegisterService
              ['expires_in' => config('sanctum.expiration')])->plainTextToken;
 
 
-            return ['token'=> $accessToken];
+            return  $accessToken;
 
 
         }catch(Throwable $exception)
         {
             DB::rollback();
             return $this->handleException($exception);
-
-            // return $e->getMessage();
         }
 
 
@@ -80,7 +79,6 @@ Class RegisterService
         {
             $folderName = 'profile';
             $folderPath = 'images/' . $folderName . '/users/' . $user_name ;
-            // $path = Storage::disk('public')->putFile($folderPath, $image);
 
         }
         else if($file_type=='pdf')
@@ -96,48 +94,50 @@ Class RegisterService
     /************************************************************************************/
     public function resendVerifyCode()
     {
-        $user = auth()->user();
-        if(!$user)
+        $cachedData = Cache::get(request()->ip()) ?? null;
+        if($cachedData==null)
         {
-            throw new AuthenticationException();
+            $cachedData = Cache::get('resend_code_' . request()->ip()) ?? null ;
         }
-        $user->generateVerificationCode();
-        return $user->verify_code;
+        // if($cachedData==null)
+            // return $this->apiError(message: 'you are verification your email already', code: 404);
+            // {
+        //     return false;
+        // }
+        $retrievedEmail = $cachedData['email'];
+            $user = User::whereEmail($retrievedEmail)->first();
+            $user->resendVerificationCode();
 
     }
     /***************************************************************************************/
     public function confirmVerifyCode($request)
     {
         $user = Auth::user();
-        if(!$user)
-        {
-            throw new AuthenticationException();
-        }
-
         $code = $request->verify_code;
-        $expired_at = $user->created_at->addMinutes(3);
 
-        if ($code !== $user->verify_code || now() > $expired_at)
-        {
-            throw new InvalidCodeException();
-        }else{
-            $user->resetVerificationCode();
-            $user->email_verified_at = now();
-            $user->save();
-            return true;
+        $cachedData = Cache::get($request->ip()) ;
+
+        if ($cachedData) {
+            $retrievedEmail = $cachedData['email'];
+            $retrievedCode = $cachedData['v_code'];
+            // return $retrievedCode;
+            if ($code !== $retrievedCode) {
+                return false;
+            } else {
+                $user->resetVerificationCode();
+                Cache::forget(request()->ip());
+                Cache::forget('resend_code_' . request()->ip());
+                return true;
+            }
         }
 
+        return false;
     }
 
     /*********************************************************************************************/
     public function refreshToken()
     {
         $user = Auth::user();
-        if(!$user)
-        {
-            throw new AuthenticationException();
-        }
-        // $oldToken = $user->currentAccessToken()->delete();
         $user->tokens()->delete();
         $refreshToken = $user->createToken('#$_refresh_token_@#',
         ['expires_in' => config('sanctum.rt_expiration')])->plainTextToken;

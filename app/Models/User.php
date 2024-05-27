@@ -3,10 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use App\Notifications\Virify\VereficationCodeNotification;
 
 class User extends Authenticatable
 {
@@ -47,13 +49,19 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public  function generateVerificationCode()
+    public function generateVerificationCode()
     {
         $verificationCode = $this->generateCode();
-        // $this->timestamps = false;
-        $this->verify_code = $verificationCode;
-        $this->email_verified_at = null;
-        $this->save();
+        Cache::remember(request()->ip(), 60*3, function () use ($verificationCode) {
+            return [
+                'email'=>$this->email,
+                'v_code'=>$verificationCode,
+            ];
+        });
+        Cache::forever('resend_code_' . request()->ip(), [
+            'email' => $this->email,
+        ]);
+        return $verificationCode;
     }
 
     /***********************************************/
@@ -71,7 +79,15 @@ class User extends Authenticatable
 
     public  function resetVerificationCode()
     {
-        $this->verify_code = null;
+        $this->email_verified_at = now();
         $this->save();
+    }
+
+    /*************************************************/
+    public function resendVerificationCode()
+    {
+        $verificationCode = $this->generateVerificationCode();
+        $minutesRemaining = 3;
+        $this->notify(new VereficationCodeNotification($verificationCode, $minutesRemaining));
     }
 }

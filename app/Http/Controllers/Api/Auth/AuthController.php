@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AuthController extends Controller
 {
-    use FileOperationsTrait;
+    use FileOperationsTrait,ApiResponseTrait;
     public  $registerService , $logoutService ,$loginService;
 
     public function __construct(RegisterService $registerService,LogoutService $logoutService,LoginService $loginService)
@@ -35,14 +35,14 @@ class AuthController extends Controller
     public function signUp(RegisterRequest $request)
     {
         $data = $this->registerService->signUp($request);
-        return response()->json($data);
+        return $this->apiSuccess('Registration successful',$data, 201);
 
     }
     /**********************************************************************/
     public function resendVerifyCode()
     {
         $newCode = $this->registerService->resendVerifyCode();
-        return response()->json(['message' => 'verification code re-send successfully', 'verification-code' => $newCode]);
+        return $this->apiSuccess('verification code re-send successfully ',null, 200);
     }
     /************************************************************************/
 
@@ -52,9 +52,11 @@ class AuthController extends Controller
 
         if($confirmCode == false)
         {
-            return response()->json(['message' => 'invalid code','code'=>$confirmCode],401);
+            $message = "Invalid code";
+            return $this->apiError(message: $message, code: 404);
         }
-        return response()->json(['message' => 'you are verification your email '],200);
+        return $this->apiSuccess('you are verification your email ',null, 200);
+
 
 
     }
@@ -76,12 +78,8 @@ class AuthController extends Controller
     /*-----------------------logout------------------*/
     public function logout(Request $request)
     {
-        try {
-            $user = $this->logoutService->logout();
-            return response()->json(['message' => 'Logged out successfully']);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
-        }
+        $user = $this->logoutService->logout();
+        return $this->apiSuccess('Logged out successfully',null, 200);
     }
     /******************************************************************************************************/
 
@@ -96,18 +94,21 @@ class AuthController extends Controller
 
         if(!$user)
         {
-            throw new UserNotFoundException();
+            $message = "User not found";
+            return $this->apiError(message: $message, code: 404);
         }
         if ($type === 'image' && $user->profile_photo !== $path) {
-            throw new AuthorizationException();
+            $message = "You are not authorized to perform this action";
+            return $this->apiError(message: $message, code: 403);
         }
         if ($type === 'pdf' && $user->certificate !== $path) {
-            throw new AuthorizationException();
+            $message = "You are not authorized to perform this action";
+            return $this->apiError(message: $message, code: 403);
         }
 
         $file = $this->delete($fullPath,'public');
+        return $this->apiSuccess('file deleted successfully',null, 200);
 
-        return response()->json(['message' => 'file deleted successfully', 'file' => $file]);
     }
 
 

@@ -41,7 +41,7 @@ class VereficationCodeNotification extends Notification
             ->subject("Verification Code")
             ->from('arazona@arazona-store.ps' , 'ARAZONA STORE')
             ->greeting("Hi {$notifiable->user_name} ,")
-            ->line("please verify your email using this code ({$notifiable->verify_code}) it will be expired after {$this->minutesRemaining} minutes")
+            ->line("please verify your email using this code ({$this->code}) it will be expired after {$this->minutesRemaining} minutes")
             ->action('verify Email', url('/dashboard'))
             ->line('Thank you for using our application');
     }
